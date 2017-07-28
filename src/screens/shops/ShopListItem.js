@@ -1,28 +1,57 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, Alert, TouchableOpacity } from 'react-native';
+import StarRating from 'react-native-star-rating';
 
 export default class ShopListItem extends Component {
+    constructor (props) {
+        super(props);
+    }
+
+    _onPress = () => {
+        this.props.onPressItem(this.props.id);
+    };
+
     render () {
         return (
-            <View style={styles.listItemContainer}>
+            <TouchableOpacity style={styles.listItemContainer} onPress={this._onPress}>
                 <View style={styles.avatarContainer}>
                     <Image
                         style={{width: 70, height: 70, resizeMode: 'contain'}}
-                        source={{uri: 'https://2c1pzz9jg5dd.jp.kiiapps.com/api/x/s.d009f7a00022-68b8-7e11-e437-03a0ad8b'}}
+                        source={{uri: this.props.avatarUrl}}
                     />
                 </View>
                 <View style={styles.contentContainer}>
-                    <Text style={styles.shopName} numberOfLines={1}> StarBuck (Guiping Road)</Text>
+                    <View style={styles.row}>
+                        <Text style={styles.shopName} numberOfLines={1}>{this.props.name}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <View style={styles.starContainer}>
+                            <StarRating
+                                disabled={true}
+                                maxStars={5}
+                                rating={this.props.stars}
+                                emptyStar={'ios-star-outline'}
+                                fullStar={'ios-star'}
+                                halfStar={'ios-star-half'}
+                                iconSet={'Ionicons'}
+                                starSize={10}
+                            />
+                        </View>
+                        <Text style={styles.rating}>{this.props.stars}</Text>
+                        <Text style={styles.rating}>Monthly Sold: {this.props.monthlySold}</Text>
+                    </View>
+                    <View style={styles.thirdRow}>
+                        <Text style={styles.fee}>Delivery Fee: ${this.props.deliveryFee}</Text>
+                        <Text style={styles.fee}>0.5 km Away</Text>
+                    </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    shopName: {
-        fontSize: 16
-    },
+
     listItemContainer: {
         backgroundColor: 'white',
         flexDirection: 'row',
@@ -34,9 +63,39 @@ const styles = StyleSheet.create({
         margin: 5
     },
     contentContainer: {
+        justifyContent: 'space-between',
         margin: 5,
         height: 70,
+        flex: 1
+    },
+    row: {
         flex: 1,
-        backgroundColor: 'darkcyan'
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    shopName: {
+        fontSize: 16,
+        margin: 5
+    },
+    starContainer: {
+        width: 70,
+        padding: 5,
+        paddingLeft: 5
+    },
+    rating: {
+        fontSize: 10,
+        color: '#a2a2a2',
+        marginRight: 5
+    },
+    thirdRow: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: 5
+    },
+    fee: {
+        fontSize: 12,
+        color: '#7b7b7b',
     }
 })

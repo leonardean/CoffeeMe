@@ -1,6 +1,7 @@
 import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
 import Icon from 'react-native-vector-icons/Ionicons';
+
 registerScreens();
 
 let shopIcon;
@@ -32,12 +33,12 @@ export default class App {
                     Icon.getImageSource('ios-contact-outline', 30)
                 ]
             ).then((values) => {
-                shopIcon = values[0];
-                shopSelectedIcon = values[1];
-                orderIcon = values[2];
-                orderSelectedIcon = values[3];
-                accountIcon = values[4];
-                accountSelectedIcon = values[5];
+                shopIcon = values[1];
+                shopSelectedIcon = values[0];
+                orderIcon = values[3];
+                orderSelectedIcon = values[2];
+                accountIcon = values[5];
+                accountSelectedIcon = values[4];
                 resolve(true);
             }).catch((error) => {
                 console.log(error);
@@ -46,7 +47,7 @@ export default class App {
         });
     }
 
-    static startApp () {
+    startApp () {
         Navigation.startTabBasedApp({
             tabs: [
                 {

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, View, ActivityIndicator, Alert} from 'react-native';
+import { FlatList, StyleSheet, View, ActivityIndicator} from 'react-native';
 import ShopListItem from './shops/ShopListItem';
 import Global from '../Global';
-import { Navigation } from 'react-native-navigation';
 
 export default class Shops extends Component {
     constructor (props) {
@@ -74,6 +73,9 @@ export default class Shops extends Component {
                                 animated: true,
                                 animationType: 'slide-horizontal',
                                 backButtonHidden: false,
+                                navigatorStyle: {
+                                    tabBarHidden: true
+                                }
                             });
                         }}
                     />}

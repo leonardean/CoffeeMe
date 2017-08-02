@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     // Individual tab container
     tabContainer: {
         flex: 1,                            // Take up equal amount of space for each tab
-        paddingVertical: 15,                // Vertical padding
+        paddingVertical: 10,                // Vertical padding
         borderBottomWidth: 3,               // Add thick border at the bottom
         borderBottomColor: 'transparent',   // Transparent border for inactive tabs
     },

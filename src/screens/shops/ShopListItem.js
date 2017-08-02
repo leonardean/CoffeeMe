@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import StarRating from 'react-native-star-rating';
 
 export default class ShopListItem extends Component {
@@ -16,7 +16,7 @@ export default class ShopListItem extends Component {
             <TouchableOpacity style={styles.listItemContainer} onPress={this._onPress}>
                 <View style={styles.avatarContainer}>
                     <Image
-                        style={{width: 70, height: 70, resizeMode: 'contain'}}
+                        style={{width: 65, height: 65, resizeMode: 'contain'}}
                         source={{uri: this.props.avatarUrl}}
                     />
                 </View>

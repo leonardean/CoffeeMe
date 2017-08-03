@@ -35,6 +35,9 @@ export default class SingleShop extends Component {
                 },
                 animated: true,
                 animationType: 'slide-horizontal',
+                navigatorStyle: {
+                    tabBarHidden: true
+                }
             });
         }
     }

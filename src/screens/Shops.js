@@ -63,7 +63,7 @@ export default class Shops extends Component {
                         monthlySold={item.shopInfo.monthly_sold}
                         deliveryFee={item.shopInfo.delivery_fee}
                         avatarUrl={item.shopInfo.avatar_url}
-                        onPressItem={(id: string) => {
+                        onPressItem={() => {
                             this.props.navigator.push({
                                 screen: 'SingleShop',
                                 title: item.shopInfo.name,

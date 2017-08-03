@@ -2,7 +2,7 @@
  * Created by leonardean on 03/08/2017.
  */
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, Platform} from 'react-native';
 import Picker from 'react-native-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Global from '../../Global';
@@ -65,7 +65,8 @@ export default class OrderConfirm extends Component {
 
     onPress = () => {
         let data = [
-            'Credit Card',
+            'Visa',
+            'Mastercard',
             'Paypal',
             'Credit Point',
             'Cash'
@@ -91,6 +92,8 @@ export default class OrderConfirm extends Component {
                 console.log(data);
             }
         });
+        if (Platform.OS === 'android')
+            Picker.show()
     }
 
     render() {

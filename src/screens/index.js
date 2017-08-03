@@ -9,6 +9,7 @@ import Account from './Account';
 import SingleShop from './shops/SingleShop';
 import Authenticate from './account/Authenticate';
 import MenuTab from './shops/MenuTab';
+import OrderConfirm from './shops/OrderConfirm'
 
 // register all screens of the app (including internal ones)
 export function registerScreens() {
@@ -18,5 +19,5 @@ export function registerScreens() {
     Navigation.registerComponent('SingleShop', () => SingleShop);
     Navigation.registerComponent('Authenticate', () => Authenticate);
     Navigation.registerComponent('MenuTab', () => MenuTab);
-
+    Navigation.registerComponent('OrderConfirm', () => OrderConfirm);
 }

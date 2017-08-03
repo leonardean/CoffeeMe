@@ -2,7 +2,7 @@
  * Created by leonardean on 28/07/2017.
  */
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import Tabs from './Tabs';
 import Global from '../../Global';
 import MenuTab from './MenuTab';
@@ -15,7 +15,7 @@ export default class SingleShop extends Component {
         };
     }
 
-    placeOrder = () => {
+    placeOrder = (order) => {
         if (Global.userAuthenticated === false) {
             this.props.navigator.push({
                 screen: 'Authenticate',
@@ -31,7 +31,7 @@ export default class SingleShop extends Component {
                 screen: 'OrderConfirm',
                 title: 'Order Confirmation',
                 passProps: {
-                    ...this.state.order
+                    order: order
                 },
                 animated: true,
                 animationType: 'slide-horizontal',
@@ -50,7 +50,6 @@ export default class SingleShop extends Component {
         return (
             <View style={styles.container}>
                 <Tabs>
-                    {/* First tab */}
                     <View title="Menu" style={styles.content}>
                         <MenuTab
                             {...this.props.shopInfo.shopInfo}
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,                            // Take up all available space
         justifyContent: 'center',           // Center vertically
-        alignItems: 'stretch',               // Center horizontally
+        alignItems: 'stretch',              // Center horizontally
         backgroundColor: '#f0f0f0',         // Darker background for content area
     },
     // Content header
@@ -104,7 +103,7 @@ const styles = StyleSheet.create({
     // Content text
     text: {
         marginHorizontal: 20,               // Add horizontal margin
-        color: 'rgba(0, 0, 0, 0.75)', // Semi-transparent text
+        color: 'rgba(0, 0, 0, 0.75)',       // Semi-transparent text
         textAlign: 'center',                // Center
         fontFamily: 'Avenir',
         fontSize: 18,

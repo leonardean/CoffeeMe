@@ -15,9 +15,17 @@ export default class MenuTab extends Component {
         this.state = {
             isLoading: true,
             cart: new Map,
-            total: 0,
             BadgeCount: 0,
-            order: {}
+            order: {
+                shop: {
+                    id: this.props._id,
+                    name: this.props.name,
+                    place: this.props.place
+                },
+                items: [],
+                delivery_fee: this.props.delivery_fee,
+                total_price: 0
+            }
         };
     }
 
@@ -58,21 +66,41 @@ export default class MenuTab extends Component {
 
     onItemAdded = (item) => {
         this.state.cart.put(item, this.state.cart.get(item) ? this.state.cart.get(item) + 1 : 1)
-        this.setState({
-            BadgeCount: this.state.BadgeCount + 1,
-            total: this.state.total + item.price
-        })
+        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price + item.price });
+        this.setState({ order, BadgeCount: this.state.BadgeCount + 1 });
     }
 
     onItemRemoved = (item) => {
-        this.setState({
-            BadgeCount: this.state.BadgeCount - 1,
-            total: this.state.total - item.price
-        })
+        this.state.cart.put(item, this.state.cart.get(item) - 1)
+        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price - item.price });
+        this.setState({ order, BadgeCount: this.state.BadgeCount - 1 });
     }
 
     placeOrder = () => {
-        this.props.placeOrder();
+        let promises = []
+        let items = []
+        let total_price = 0
+        for(let i = 0; i++ < this.state.cart.size; this.state.cart.next()) {
+            let promise = new Promise((resolve, reject) => {
+                let item = {
+                    id: this.state.cart.key()._id,
+                    avatar_url: this.state.cart.key().avatar_url,
+                    name: this.state.cart.key().name,
+                    price: this.state.cart.key().price,
+                    quantity: this.state.cart.value(),
+                    sub_total: this.state.cart.key().price * this.state.cart.value()
+                }
+                total_price += item.sub_total
+                items.push(item)
+                resolve(item)
+            })
+            promises.push(promise)
+        }
+        Promise.all(promises).then(() => {
+            const order = Object.assign({}, this.state.order, { items: items, total_price: total_price });
+            this.setState({order});
+            this.props.placeOrder(this.state.order);
+        })
     }
 
     render () {
@@ -113,14 +141,14 @@ export default class MenuTab extends Component {
                             Hidden={this.state.BadgeCount === 0}
                         />
                         <View style={styles.totalPrice}>
-                            <Text style={{fontSize: 16, color: '#0c64ff'}}>${this.state.total} </Text>
+                            <Text style={{fontSize: 16, color: '#0c64ff'}}>${this.state.order.total_price} </Text>
                             <Text style={{fontSize: 10, color: '#a2a2a2'}}>
                                 Delivery Fee: {this.props.delivery_fee}
                             </Text>
                         </View>
 
                     </View>
-                    <Icon.Button name="ios-pricetag" size={20} iconStyle={{marginRight: 10}}
+                    <Icon.Button name="ios-pricetag" size={22} iconStyle={{marginRight: 10}}
                                  color="white"
                                  backgroundColor={this.state.BadgeCount === 0 ? '#91b9ff' : '#0c64ff'}
                                  borderRadius={0}
@@ -131,7 +159,6 @@ export default class MenuTab extends Component {
             </View>
         )
     }
-
 }
 
 const styles = StyleSheet.create({

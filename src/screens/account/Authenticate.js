@@ -53,6 +53,7 @@ export default class Authenticate extends React.Component{
             .then((response) => response.json())
             .then((responseJson) => {
                 Global.userAuthenticated = true
+                Global.userID = responseJson.id
                 Global.userAccessToken = responseJson.access_token
                 Global.username = this.state.username
                 Toast.show('Login Success!')

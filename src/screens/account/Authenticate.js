@@ -2,7 +2,7 @@
  * Created by leonardean on 02/08/2017.
  */
 import React from 'react';
-import { View, Button, TextInput, StyleSheet, Alert} from 'react-native';
+import { View, Button, TextInput, StyleSheet} from 'react-native';
 import Global from '../../Global';
 import Toast from 'react-native-root-toast';
 
@@ -29,8 +29,9 @@ export default class Authenticate extends React.Component{
     onNavigatorEvent (event) {
         if (event.type === 'NavBarButtonPress') {
             if (event.id === 'cancel') {
-                this.props.navigator.dismissAllModals({
-                    animationType: 'slide-down'
+                this.props.navigator.pop({
+                    animated: true,
+                    animationType: 'fade'
                 });
             }
         }
@@ -55,8 +56,9 @@ export default class Authenticate extends React.Component{
                 Global.userAccessToken = responseJson.access_token
                 Global.username = this.state.username
                 Toast.show('Login Success!')
-                this.props.navigator.dismissAllModals({
-                    animationType: 'slide-down'
+                this.props.navigator.pop({
+                    animated: true,
+                    animationType: 'fade'
                 });
             })
             .catch((error) => {
@@ -95,11 +97,6 @@ export default class Authenticate extends React.Component{
                         title="Login"
                         color="#0c64ff"
                         disabled={!(this.state.username && this.state.password)}
-                    />
-                    <Button
-                        onPress={this.login}
-                        title="Register"
-                        color="#0c64ff"
                     />
                 </View>
             </View>

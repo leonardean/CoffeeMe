@@ -6,8 +6,9 @@ import { Navigation } from 'react-native-navigation';
 import Shops from './Shops';
 import Orders from './Orders';
 import Account from './Account';
-import SingleShop from './shops/SingleShop'
-import Authenticate from './account/Authenticate'
+import SingleShop from './shops/SingleShop';
+import Authenticate from './account/Authenticate';
+import MenuTab from './shops/MenuTab';
 
 // register all screens of the app (including internal ones)
 export function registerScreens() {
@@ -16,4 +17,6 @@ export function registerScreens() {
     Navigation.registerComponent('Account', () => Account);
     Navigation.registerComponent('SingleShop', () => SingleShop);
     Navigation.registerComponent('Authenticate', () => Authenticate);
+    Navigation.registerComponent('MenuTab', () => MenuTab);
+
 }

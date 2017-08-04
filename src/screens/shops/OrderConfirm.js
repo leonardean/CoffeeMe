@@ -39,7 +39,6 @@ export default class OrderConfirm extends Component {
                         return recipient
                     }
                 })
-                console.log(recipient[0])
                 this.setState({
                     isLoading: false,
                     order: Object.assign({}, this.state.order, { customer: {
@@ -60,7 +59,30 @@ export default class OrderConfirm extends Component {
     }
 
     placeOrder = () => {
-        Alert.alert('Order Placed !')
+        this.setState({
+            order: Object.assign({}, this.state.order, {
+                order_status: 0,
+                timestamp_order_placed: new Date()
+            })
+        }, () => {
+            console.log(this.state.order)
+            fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer '+ Global.userAccessToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.state.order)
+            })
+                .then((response) => {
+                    if (response.status === 201)
+                        Alert.alert('Order Placed !!!')
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
+        })
     }
 
     onPress = () => {

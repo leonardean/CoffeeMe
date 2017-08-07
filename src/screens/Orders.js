@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, FlatList, ActivityIndicator, Alert} from 'react-native';
 import Global from '../Global';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import OrderListItem from './orders/OrderListItem';
@@ -9,8 +9,22 @@ export default class Orders extends React.Component {
         super(props);
         this.state = {
             isLoading: true,
-            isLogin: false
+            isLogin: false,
+            refreshing: false
         };
+    }
+
+    _refresh = () => {
+        return new Promise((resolve) => {
+            this.setState({
+                refreshing: true
+            })
+            this.fetchOrders(() => {
+                this.setState({
+                    refreshing: false
+                }, resolve())
+            })
+        });
     }
 
     componentDidMount () {
@@ -25,40 +39,44 @@ export default class Orders extends React.Component {
         }, 2000)
     }
 
+    fetchOrders = (cb) => {
+        fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/query', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + Global.userAccessToken,
+                'Content-Type': 'application/vnd.kii.QueryRequest+json',
+            },
+            body: JSON.stringify({
+                "bucketQuery": {
+                    "clause": {
+                        "type": "eq",
+                        "field": "customer.id",
+                        "value": Global.userID
+                    }
+                },
+                "bestEffortLimit": 10
+            })
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    isLoading: false,
+                    orderList: responseJson.results.map(order => {
+                        return {
+                            key: order['_id'],
+                            orderInfo: order
+                        }
+                    })
+                }, cb)
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     componentDidUpdate (prevProps, prevState) {
         if (prevState.isLogin === false && this.state.isLogin === true) {
-            fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/query', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + Global.userAccessToken,
-                    'Content-Type': 'application/vnd.kii.QueryRequest+json',
-                },
-                body: JSON.stringify({
-                    "bucketQuery": {
-                        "clause": {
-                            "type": "eq",
-                            "field": "customer.id",
-                            "value": Global.userID
-                        }
-                    },
-                    "bestEffortLimit": 10
-                })
-            })
-                .then((response) => response.json())
-                .then((responseJson) => {
-                    this.setState({
-                        isLoading: false,
-                        orderList: responseJson.results.map(order => {
-                            return {
-                                key: order['_id'],
-                                orderInfo: order
-                            }
-                        })
-                    })
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+            this.fetchOrders()
         }
     }
 
@@ -109,6 +127,8 @@ export default class Orders extends React.Component {
                 {Global.userAuthenticated ?
                     <View>
                         <FlatList
+                            onRefresh={this._refresh}
+                            refreshing={this.state.refreshing}
                             data={this.state.orderList}
                             renderItem={({item}) => <OrderListItem
                                 order={item.orderInfo}

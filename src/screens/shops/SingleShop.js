@@ -19,6 +19,7 @@ export default class SingleShop extends Component {
         if (Global.userAuthenticated === false) {
             this.props.navigator.push({
                 screen: 'Authenticate',
+                title: 'User Authentication',
                 animated: true,
                 animationType: 'fade',
                 backButtonHidden: true,
@@ -55,7 +56,7 @@ export default class SingleShop extends Component {
                 <Tabs>
                     <View title="Menu" style={styles.content}>
                         <MenuTab
-                            {...this.props.shopInfo.shopInfo}
+                            {...this.props.shopInfo}
                             placeOrder={this.placeOrder} />
                     </View>
                     {/* Second tab */}

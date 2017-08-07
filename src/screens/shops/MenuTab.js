@@ -20,7 +20,8 @@ export default class MenuTab extends Component {
                 shop: {
                     id: this.props._id,
                     name: this.props.name,
-                    place: this.props.place
+                    place: this.props.place,
+                    avatar_url: this.props.avatar_url
                 },
                 items: [],
                 delivery_fee: this.props.delivery_fee,
@@ -49,6 +50,7 @@ export default class MenuTab extends Component {
         })
             .then((response) => response.json())
             .then((responseJson) => {
+                console.log(responseJson)
                 this.setState({
                     isLoading: false,
                     itemsList: responseJson.results.map(item => {

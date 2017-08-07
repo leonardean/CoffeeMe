@@ -24,7 +24,7 @@ export default class Authenticate extends React.Component{
                 id: 'cancel'
             }
         ]
-    };
+    }
 
     onNavigatorEvent (event) {
         if (event.type === 'NavBarButtonPress') {
@@ -57,6 +57,8 @@ export default class Authenticate extends React.Component{
                 Global.userAccessToken = responseJson.access_token
                 Global.username = this.state.username
                 Toast.show('Login Success!')
+                if (this.props.didLogin)
+                    this.props.didLogin()
                 this.props.navigator.pop({
                     animated: true,
                     animationType: 'fade'

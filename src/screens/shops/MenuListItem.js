@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     listItemContainer: {
         backgroundColor: 'white',
         flexDirection: 'row',
-        marginTop: 2
+        marginTop: 4
     },
     avatarContainer: {
         height: 70,

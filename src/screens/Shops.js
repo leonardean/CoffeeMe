@@ -68,7 +68,7 @@ export default class Shops extends Component {
                                 screen: 'SingleShop',
                                 title: item.shopInfo.name,
                                 passProps: {
-                                    shopInfo: item
+                                    shopInfo: item.shopInfo
                                 },
                                 animated: true,
                                 animationType: 'slide-horizontal',

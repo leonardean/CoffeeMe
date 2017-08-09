@@ -5,6 +5,7 @@ import React from 'react';
 import { View, Button, TextInput, StyleSheet} from 'react-native';
 import Global from '../../Global';
 import Toast from 'react-native-root-toast';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class Authenticate extends React.Component{
 
@@ -12,7 +13,8 @@ export default class Authenticate extends React.Component{
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loggingIn: false
         };
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
@@ -38,7 +40,10 @@ export default class Authenticate extends React.Component{
     }
 
     login = () => {
-        return fetch('https://api-jp.kii.com/api/oauth2/token', {
+        this.setState({
+            loggingIn: true
+        }, () => {
+            fetch('https://api-jp.kii.com/api/oauth2/token', {
             method: 'POST',
             headers: {
                 'X-Kii-AppID': Global.appID,
@@ -59,19 +64,26 @@ export default class Authenticate extends React.Component{
                 Toast.show('Login Success!')
                 if (this.props.didLogin)
                     this.props.didLogin()
-                this.props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                });
+                this.setState({
+                    loggingIn: false
+                }, () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    });
+                })
             })
             .catch((error) => {
                 console.error(error);
             });
+        })
     }
 
     render() {
         return (
             <View style={styles.container}>
+                <Spinner visible={this.state.loggingIn} size="small" textContent={"Logging In..."}
+                         textStyle={{color: '#FFF', marginTop: -30, fontSize: 14}} />
                 <View style={{borderBottomColor: '#c3c3c3', borderBottomWidth: 0.5}}>
                     <TextInput
                         style={styles.input}

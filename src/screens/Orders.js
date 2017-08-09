@@ -32,8 +32,10 @@ export default class Orders extends React.Component {
             if (Global.userAuthenticated === true && this.state.isLogin === false) {
                 this.setState({
                     isLogin: true
-                }, () => {
-                    clearInterval(monitorLogin)
+                })
+            } else if (Global.userAuthenticated === false) {
+                this.setState({
+                    isLogin: false
                 })
             }
         }, 2000)

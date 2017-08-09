@@ -19,6 +19,10 @@ export default class OrderListItem extends Component {
         this.props.onShopPress(this.props.order)
     }
 
+    goToOrderInfo = () => {
+        this.props.onOrderPress(this.props.order)
+    }
+
     render () {
         let items = []
         this.props.order.items.forEach((item) => {
@@ -48,7 +52,7 @@ export default class OrderListItem extends Component {
         )
 
         return (
-            <TouchableOpacity style={styles.listItemContainer} onPress={this.props.onPress}>
+            <TouchableOpacity style={styles.listItemContainer} onPress={this.goToOrderInfo}>
                 <TouchableOpacity style={[styles.segment, styles.header, styles.row,
                     {borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0'}]}
                                   onPress={this.goToShop}>
@@ -69,7 +73,7 @@ export default class OrderListItem extends Component {
                 <View style={[styles.segment, styles.footer, styles.row,
                     {borderTopWidth: 0.5, borderTopColor: '#f0f0f0', paddingVertical: 3}]}>
                     <Text style={{alignSelf: 'center', color: '#c2c2c2', marginLeft: 5}}>Order Completed</Text>
-                    <Icon.Button backgroundColor="#0c64ff" iconStyle={{marginRight: 0}} onPress={this.goToShop} >
+                    <Icon.Button backgroundColor="#ffffff" color="black" iconStyle={{marginRight: 0}} onPress={this.goToShop} >
                         Order Again
                     </Icon.Button>
                 </View>

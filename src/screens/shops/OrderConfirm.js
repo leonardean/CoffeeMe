@@ -6,6 +6,7 @@ import {Text, View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator,
 import Picker from 'react-native-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Global from '../../Global';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class OrderConfirm extends Component {
     constructor(props) {
@@ -16,7 +17,8 @@ export default class OrderConfirm extends Component {
                 total_price: this.props.order.total_price + this.props.order.delivery_fee
             }),
             ready: false,
-            isLoading: true
+            isLoading: true,
+            placingOrder: false
         }
     }
 
@@ -60,12 +62,12 @@ export default class OrderConfirm extends Component {
 
     placeOrder = () => {
         this.setState({
+            placingOrder: true,
             order: Object.assign({}, this.state.order, {
                 order_status: 0,
                 timestamp_order_placed: new Date()
             })
         }, () => {
-            console.log(this.state.order)
             fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects', {
                 method: 'POST',
                 headers: {
@@ -75,13 +77,42 @@ export default class OrderConfirm extends Component {
                 body: JSON.stringify(this.state.order)
             })
                 .then((response) => {
+                    // console.log(response)
                     if (response.status === 201)
-                        Alert.alert('Order Placed !!!')
+                        return response.json()
+                })
+                .then((responseJson) => {
+                    // console.log(responseJson)
+                    fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects/' + responseJson.objectID, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer '+ Global.userAccessToken
+                        },
+                    })
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            this.setState({
+                                placingOrder: false
+                            }, () => {
+                                this.props.navigator.push({
+                                    screen: 'OrderInfo',
+                                    title: 'Order Details',
+                                    animated: true,
+                                    animationType: 'slide-horizontal',
+                                    backButtonHidden: false,
+                                    navigatorStyle: {
+                                        tabBarHidden: true
+                                    },
+                                    passProps: {
+                                        order: responseJson
+                                    },
+                                })
+                            })
+                        })
                 })
                 .catch((error) => {
                     console.error(error);
                 });
-
         })
     }
 
@@ -128,6 +159,8 @@ export default class OrderConfirm extends Component {
         }
         return (
             <View style={styles.container}>
+                <Spinner visible={this.state.placingOrder} size="small" textContent={"Placing Order..."}
+                         textStyle={{color: '#FFF', marginTop: -30, fontSize: 14}} />
                 <View style={styles.contentContainer}>
                     <ScrollView>
                         <TouchableOpacity style={[styles.segment, styles.row]}>

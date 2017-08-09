@@ -52,7 +52,9 @@ export default class Orders extends React.Component {
                         "type": "eq",
                         "field": "customer.id",
                         "value": Global.userID
-                    }
+                    },
+                    "orderBy": "timestamp_order_placed",
+                    "descending": true
                 },
                 "bestEffortLimit": 10
             })
@@ -97,6 +99,22 @@ export default class Orders extends React.Component {
         });
     }
 
+    goToOrderInfo = (order) => {
+        this.props.navigator.push({
+            screen: 'OrderInfo',
+            title: 'Order Details',
+            animated: true,
+            animationType: 'slide-horizontal',
+            backButtonHidden: false,
+            navigatorStyle: {
+                tabBarHidden: true
+            },
+            passProps: {
+                order: order
+            },
+        })
+    }
+
     showAuthenticate = () => {
         this.props.navigator.push({
             screen: 'Authenticate',
@@ -134,6 +152,7 @@ export default class Orders extends React.Component {
                                 order={item.orderInfo}
                                 onOrderAgainPress={this.goToShop}
                                 onShopPress={this.goToShop}
+                                onOrderPress={this.goToOrderInfo}
                             />}
                         />
                     </View>:

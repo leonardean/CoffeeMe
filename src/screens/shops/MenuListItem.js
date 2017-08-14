@@ -10,10 +10,13 @@ export default class ShopListItem extends Component {
         };
     }
 
-    onItemAdded = () => {
+    markItemAdded = (number) => {
         this.setState({
-            counter: this.state.counter + 1
+            counter: this.state.counter + number
         })
+    }
+
+    onItemAdded = () => {
         this.props.onItemAdded(this.props.item)
     }
 

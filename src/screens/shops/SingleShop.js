@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import Tabs from './Tabs';
 import Global from '../../Global';
 import MenuTab from './MenuTab';
+import CommentsTab from './CommentsTab';
 
 export default class SingleShop extends Component {
 
@@ -61,12 +62,7 @@ export default class SingleShop extends Component {
                     </View>
                     {/* Second tab */}
                     <View title="Comments" style={styles.content}>
-                        <Text style={styles.header}>
-                            Truly Native
-                        </Text>
-                        <Text style={styles.text}>
-                            Components you define will end up rendering as native platform widgets
-                        </Text>
+                        <CommentsTab></CommentsTab>
                     </View>
                     {/* Third tab */}
                     <View title="Shop" style={styles.content}>

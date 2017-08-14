@@ -2,12 +2,15 @@
  * Created by leonardean on 02/08/2017.
  */
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image} from 'react-native';
 import MenuListItem from './MenuListItem';
 import Global from '../../Global';
 import Map from '../../components/util/Map';
 import Icon from 'react-native-vector-icons/Ionicons';
 import IconBadge from 'react-native-icon-badge';
+import Button from 'react-native-button';
+import Modal from 'react-native-modalbox';
+import ItemOption from './ItemOption';
 
 export default class MenuTab extends Component {
     constructor (props) {
@@ -16,6 +19,7 @@ export default class MenuTab extends Component {
             isLoading: true,
             cart: new Map,
             BadgeCount: 0,
+            itemFocus: false,
             order: {
                 shop: {
                     id: this.props._id,
@@ -30,7 +34,7 @@ export default class MenuTab extends Component {
         };
     }
 
-    componentDidMount () {
+    componentWillMount () {
         return fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/STOCK_ITEMS_CONSUMER/query', {
             method: 'POST',
             headers: {
@@ -67,9 +71,14 @@ export default class MenuTab extends Component {
     }
 
     onItemAdded = (item) => {
-        this.state.cart.put(item, this.state.cart.get(item) ? this.state.cart.get(item) + 1 : 1)
-        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price + item.price });
-        this.setState({ order, BadgeCount: this.state.BadgeCount + 1 });
+        this.setState({
+            currentItem: item,
+            itemFocus: true,
+        }, this.refs.itemCustomizationModal.open)
+
+        // this.state.cart.put(item, this.state.cart.get(item) ? this.state.cart.get(item) + 1 : 1)
+        // const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price + item.price });
+        // this.setState({ order, BadgeCount: this.state.BadgeCount + 1 }, this.refs[item._id].markItemAdded(1));
     }
 
     onItemRemoved = (item) => {
@@ -78,12 +87,21 @@ export default class MenuTab extends Component {
         this.setState({ order, BadgeCount: this.state.BadgeCount - 1 });
     }
 
+    onOptionChange = (option, priceChange) => {
+        console.log(priceChange)
+        this.setState({
+            currentItem: Object.assign({}, this.state.currentItem, {
+                price: this.state.currentItem.price + priceChange
+            })
+        })
+    }
+
     placeOrder = () => {
         let promises = []
         let items = []
         let total_price = 0
         for(let i = 0; i++ < this.state.cart.size; this.state.cart.next()) {
-            let promise = new Promise((resolve, reject) => {
+            let promise = new Promise((resolve) => {
                 let item = {
                     id: this.state.cart.key()._id,
                     avatar_url: this.state.cart.key().avatar_url,
@@ -113,17 +131,31 @@ export default class MenuTab extends Component {
                 </View>
             );
         }
+        let items = this.state.itemsList.map(item => {
+            return (
+                <MenuListItem
+                    ref={item.key}
+                    item={{...item.itemInfo}}
+                    onItemAdded={this.onItemAdded}
+                    onItemRemoved={this.onItemRemoved}
+                />
+            )
+        })
+
+        let options
+        if (this.state.currentItem !== undefined)
+            options = this.state.currentItem.options.map(option => {
+                return (
+                    <ItemOption {...option} onOptionChange={this.onOptionChange}/>
+                )
+            })
+
         return (
             <View style={styles.menuContainer}>
                 <View style={styles.menuItemContainer}>
-                    <FlatList
-                        data={this.state.itemsList}
-                        renderItem={({item}) => <MenuListItem
-                            item={{...item.itemInfo}}
-                            onItemAdded={this.onItemAdded}
-                            onItemRemoved={this.onItemRemoved}
-                        />}
-                    />
+                    <ScrollView>
+                        {items}
+                    </ScrollView>
                 </View>
                 <View style={styles.cartContainer}>
                     <View style={styles.summary}>
@@ -158,6 +190,27 @@ export default class MenuTab extends Component {
                         Place Order
                     </Icon.Button>
                 </View>
+                <Modal style={[styles.itemCustomizationModal]} position={"bottom"} ref={"itemCustomizationModal"} swipeToClose={false}>
+                    <View style={styles.customizationTitle}>
+                        <View style={styles.customizationAvatarContainer}>
+                            <Image
+                                style={{width: 65, height: 65, resizeMode: 'contain'}}
+                                source={{uri: "https://2c1pzz9jg5dd.jp.kiiapps.com/api/x/s.d009f7a00022-68b8-7e11-9667-00647846"}}
+                            />
+                        </View>
+                        <View style={{justifyContent: 'space-around', paddingVertical: 10}}>
+                            <Text style={styles.itemName}>{this.state.itemFocus === true ? this.state.currentItem.name : ''}</Text>
+                            <Text style={styles.rating}>Monthly Sold: {this.state.itemFocus === true ? this.state.currentItem.monthly_sold : ''}</Text>
+                        </View>
+                    </View>
+                    <ScrollView style={styles.customizationOptions}>
+                        {options}
+                    </ScrollView>
+                    <View style={styles.customizationFooter}>
+                        <Text style={{fontSize: 16, color: '#91b9ff'}}>$ {this.state.itemFocus === true ? this.state.currentItem.price: ''}</Text>
+                        <Button style={styles.button} containerStyle={{borderRadius: 2, overflow: 'hidden'}}>Add to Cart</Button>
+                    </View>
+                </Modal>
             </View>
         )
     }
@@ -186,5 +239,51 @@ const styles = StyleSheet.create({
     totalPrice: {
         justifyContent: 'space-around',
         marginLeft: 10
+    },
+    itemCustomizationModal: {
+        height: 300,
+        justifyContent: 'space-between',
+    },
+    customizationTitle: {
+        flexDirection: 'row',
+        borderBottomWidth: 0.5,
+        borderBottomColor: '#f0f0f0'
+    },
+    customizationAvatarContainer: {
+        height:80,
+        width: 85,
+        margin: 5,
+        backgroundColor: 'white',
+        marginTop: -20,
+        padding: 10,
+        borderRadius: 5
+    },
+    itemName: {
+        fontSize: 16,
+        marginHorizontal: 5
+    },
+    rating: {
+        fontSize: 10,
+        color: '#a2a2a2',
+        marginHorizontal: 5
+    },
+    customizationOptions: {
+        flex: 1,
+        marginVertical: 5
+    },
+    customizationFooter: {
+        height: 40,
+        flexDirection: 'row',
+        borderTopWidth: 0.5,
+        borderTopColor: '#f0f0f0',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
+    button: {
+        backgroundColor: "#0c64ff",
+        color: "white",
+        padding: 8,
+        fontSize: 14,
     }
 })

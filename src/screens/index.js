@@ -9,6 +9,7 @@ import Account from './Account';
 import SingleShop from './shops/SingleShop';
 import Authenticate from './account/Authenticate';
 import MenuTab from './shops/MenuTab';
+import CommentsTab from './shops/CommentsTab';
 import OrderConfirm from './shops/OrderConfirm';
 import OrderInfo from './orders/OrderInfo';
 
@@ -22,4 +23,5 @@ export function registerScreens() {
     Navigation.registerComponent('MenuTab', () => MenuTab);
     Navigation.registerComponent('OrderConfirm', () => OrderConfirm);
     Navigation.registerComponent('OrderInfo', () => OrderInfo);
+    Navigation.registerComponent('CommentsTab', () => CommentsTab);
 }

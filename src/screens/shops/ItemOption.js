@@ -49,7 +49,7 @@ export default class ItemOption extends React.Component {
     render () {
         let optionItems = this.state.values.map((value)=>{
             return (
-                <TouchableOpacity onPress={() => this._onOptionPress(value)}
+                <TouchableOpacity onPress={() => this._onOptionPress(value)} key={value.name}
                                   style={value.selected === true ? styles.optionItemSelected : styles.optionItemUnselected}>
                     <Text style={value.selected === true ? styles.textSelected: styles.textUnselected}>{value.name}</Text>
                 </TouchableOpacity>

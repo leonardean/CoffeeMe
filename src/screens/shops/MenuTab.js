@@ -2,7 +2,7 @@
  * Created by leonardean on 02/08/2017.
  */
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
 import MenuListItem from './MenuListItem';
 import Global from '../../Global';
 import Map from '../../components/util/Map';
@@ -11,6 +11,7 @@ import IconBadge from 'react-native-icon-badge';
 import Button from 'react-native-button';
 import Modal from 'react-native-modalbox';
 import ItemOption from './ItemOption';
+import ItemRemovalSelection from './ItemRemovalSelection';
 
 export default class MenuTab extends Component {
     constructor (props) {
@@ -18,6 +19,7 @@ export default class MenuTab extends Component {
         this.state = {
             isLoading: true,
             cart: new Map,
+            cartItems: [],
             BadgeCount: 0,
             itemFocus: false,
             order: {
@@ -75,23 +77,114 @@ export default class MenuTab extends Component {
             currentItem: item,
             itemFocus: true,
         }, this.refs.itemCustomizationModal.open)
+    }
 
-        // this.state.cart.put(item, this.state.cart.get(item) ? this.state.cart.get(item) + 1 : 1)
-        // const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price + item.price });
-        // this.setState({ order, BadgeCount: this.state.BadgeCount + 1 }, this.refs[item._id].markItemAdded(1));
+    getItemFeatureKey = (item) => {
+        let key = item._id + '|'
+        item.options.forEach((option) => {
+            option.values.forEach((value, index) => {
+                if (value.selected === true)
+                    key += index.toString()
+            })
+        })
+        return key
+    }
+
+    onItemAddedToCart = () => {
+        let itemFeatureKey = this.getItemFeatureKey(this.state.currentItem)
+        this.state.cart.put(itemFeatureKey, this.state.cart.get(itemFeatureKey) ?
+            Object.assign({},this.state.cart.get(itemFeatureKey), {
+                quantity: this.state.cart.get(itemFeatureKey).quantity + 1,
+                sub_total: this.state.cart.get(itemFeatureKey).sub_total + this.state.currentItem.price
+        }) : Object.assign({},this.state.currentItem, {
+                quantity: 1,
+                sub_total: this.state.currentItem.price
+            }))
+        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price + this.state.currentItem.price})
+        this.setState({ order, BadgeCount: this.state.BadgeCount + 1}, () => {
+            this.refs[this.state.currentItem._id].markItemAdded(1)
+            this.refs.itemCustomizationModal.close()
+        })
+    }
+
+    onItemRemovedFromCart = () => {
+        let itemFeatureKey = this.getItemFeatureKey(this.state.currentItem)
+        if (this.state.cart.get(itemFeatureKey).quantity === 1)
+            this.state.cart.remove(itemFeatureKey)
+        else
+            this.state.cart.put(itemFeatureKey,
+                Object.assign({},this.state.cart.get(itemFeatureKey), {
+                    quantity: this.state.cart.get(itemFeatureKey).quantity - 1,
+                    sub_total: this.state.cart.get(itemFeatureKey).sub_total - this.state.currentItem.price
+                }))
+        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price - this.state.currentItem.price });
+        this.setState({ order, BadgeCount: this.state.BadgeCount - 1 }, () => {
+            this.refs[this.state.currentItem._id].markItemRemoved(1)
+        });
     }
 
     onItemRemoved = (item) => {
-        this.state.cart.put(item, this.state.cart.get(item) - 1)
-        const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price - item.price });
-        this.setState({ order, BadgeCount: this.state.BadgeCount - 1 });
+        let itemCount = this.refs[item._id].getItemCounter()
+        if (itemCount === 1) {
+            this.state.cart.put(item, this.state.cart.get(item) - 1)
+            const order = Object.assign({}, this.state.order, { total_price: this.state.order.total_price - item.price });
+            this.setState({ order, BadgeCount: this.state.BadgeCount - 1 }, () => {
+                this.refs[item._id].markItemRemoved(1)
+            });
+        } else {
+            let currentItemsToBeRemoved = []
+            let promises = []
+            for (let i = 0; i ++ < this.state.cart.size; this.state.cart.next()) {
+                let promise = new Promise((resolve) => {
+                    if (this.state.cart.key().split('|')[0] === item._id) {
+                        currentItemsToBeRemoved.push(
+                            <ItemRemovalSelection
+                                key={this.state.cart.key()}
+                                item={this.state.cart.value()}
+                                onItemAdded={(item) => {
+                                    this.setState({
+                                        currentItem: item,
+                                        itemFocus: true,
+                                    }, this.onItemAddedToCart)
+                                }}
+                                onItemRemoved={(item) => {
+                                    this.setState({
+                                        currentItem: item,
+                                        itemFocus: true,
+                                    }, this.onItemRemovedFromCart)
+                                }}
+                            />
+                        )
+                    }
+                    resolve()
+                })
+                promises.push(promise)
+            }
+            Promise.all(promises).then(() => {
+                this.setState({
+                    currentItem: item,
+                    itemFocus: true,
+                    currentItemsToBeRemoved: currentItemsToBeRemoved
+                }, () => {
+                    this.refs.itemRemovalModal.open()
+                    for (let i = 0; i ++ < this.state.cart.size; this.state.cart.next()) {
+                    }
+                })
+            })
+        }
     }
 
     onOptionChange = (option, priceChange) => {
-        console.log(priceChange)
         this.setState({
             currentItem: Object.assign({}, this.state.currentItem, {
-                price: this.state.currentItem.price + priceChange
+                price: this.state.currentItem.price + priceChange,
+                options: this.state.currentItem.options.map((prevOption) => {
+                    if (prevOption.name === option.name)
+                        return option
+                    else
+                        return prevOption
+
+                })
             })
         })
     }
@@ -123,6 +216,11 @@ export default class MenuTab extends Component {
         })
     }
 
+    onSummaryPressed = () => {
+
+        this.refs.summaryModal.open()
+    }
+
     render () {
         if (this.state.isLoading) {
             return (
@@ -134,6 +232,7 @@ export default class MenuTab extends Component {
         let items = this.state.itemsList.map(item => {
             return (
                 <MenuListItem
+                    key={item.key}
                     ref={item.key}
                     item={{...item.itemInfo}}
                     onItemAdded={this.onItemAdded}
@@ -146,7 +245,7 @@ export default class MenuTab extends Component {
         if (this.state.currentItem !== undefined)
             options = this.state.currentItem.options.map(option => {
                 return (
-                    <ItemOption {...option} onOptionChange={this.onOptionChange}/>
+                    <ItemOption {...option} key={option.name} onOptionChange={this.onOptionChange}/>
                 )
             })
 
@@ -156,9 +255,15 @@ export default class MenuTab extends Component {
                     <ScrollView>
                         {items}
                     </ScrollView>
+                    <Modal style={[styles.itemCustomizationModal]}
+                           position={"bottom"} ref={"summaryModal"}
+                           swipeToClose={true}>
+
+                    </Modal>
                 </View>
+
                 <View style={styles.cartContainer}>
-                    <View style={styles.summary}>
+                    <TouchableOpacity style={styles.summary} onPress={this.onSummaryPressed}>
                         <IconBadge
                             MainElement={
                                 <View style={{width: 30, height: 30, margin: 5}}>
@@ -181,7 +286,7 @@ export default class MenuTab extends Component {
                             </Text>
                         </View>
 
-                    </View>
+                    </TouchableOpacity>
                     <Icon.Button name="ios-pricetag" size={22} iconStyle={{marginRight: 10}}
                                  color="white"
                                  backgroundColor={this.state.BadgeCount === 0 ? '#91b9ff' : '#0c64ff'}
@@ -190,12 +295,12 @@ export default class MenuTab extends Component {
                         Place Order
                     </Icon.Button>
                 </View>
-                <Modal style={[styles.itemCustomizationModal]} position={"bottom"} ref={"itemCustomizationModal"} swipeToClose={false}>
+                <Modal style={[styles.itemCustomizationModal]} position={"center"} ref={"itemCustomizationModal"} swipeToClose={false}>
                     <View style={styles.customizationTitle}>
                         <View style={styles.customizationAvatarContainer}>
                             <Image
                                 style={{width: 65, height: 65, resizeMode: 'contain'}}
-                                source={{uri: "https://2c1pzz9jg5dd.jp.kiiapps.com/api/x/s.d009f7a00022-68b8-7e11-9667-00647846"}}
+                                source={{uri: this.state.itemFocus === true ? this.state.currentItem.avatar_url: ''}}
                             />
                         </View>
                         <View style={{justifyContent: 'space-around', paddingVertical: 10}}>
@@ -207,9 +312,32 @@ export default class MenuTab extends Component {
                         {options}
                     </ScrollView>
                     <View style={styles.customizationFooter}>
-                        <Text style={{fontSize: 16, color: '#91b9ff'}}>$ {this.state.itemFocus === true ? this.state.currentItem.price: ''}</Text>
-                        <Button style={styles.button} containerStyle={{borderRadius: 2, overflow: 'hidden'}}>Add to Cart</Button>
+                        <Text style={{fontSize: 16, color: '#0c64ff'}}>
+                            $ {this.state.itemFocus === true ? this.state.currentItem.price: ''}
+                        </Text>
+                        <Button style={styles.button}
+                                containerStyle={{borderRadius: 2, overflow: 'hidden'}}
+                                onPress={this.onItemAddedToCart}>
+                            Add to Cart
+                        </Button>
                     </View>
+                </Modal>
+                <Modal style={[styles.itemCustomizationModal]} position={"center"} ref={"itemRemovalModal"} swipeToClose={false}>
+                    <View style={styles.customizationTitle}>
+                        <View style={styles.customizationAvatarContainer}>
+                            <Image
+                                style={{width: 65, height: 65, resizeMode: 'contain'}}
+                                source={{uri: this.state.itemFocus === true ? this.state.currentItem.avatar_url: ''}}
+                            />
+                        </View>
+                        <View style={{justifyContent: 'space-around', paddingVertical: 10}}>
+                            <Text style={styles.itemName}>{this.state.itemFocus === true ? this.state.currentItem.name : ''}</Text>
+                            <Text style={styles.rating}>Monthly Sold: {this.state.itemFocus === true ? this.state.currentItem.monthly_sold : ''}</Text>
+                        </View>
+                    </View>
+                    <ScrollView style={styles.customizationOptions}>
+                        {this.state.currentItemsToBeRemoved}
+                    </ScrollView>
                 </Modal>
             </View>
         )
@@ -225,7 +353,6 @@ const styles = StyleSheet.create({
     },
     cartContainer: {
         height: 40,
-        backgroundColor: 'green',
         flexDirection: 'row',
     },
     summary: {
@@ -268,8 +395,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5
     },
     customizationOptions: {
-        flex: 1,
-        marginVertical: 5
+        flex: 1
     },
     customizationFooter: {
         height: 40,

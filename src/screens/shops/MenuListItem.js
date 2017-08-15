@@ -16,14 +16,21 @@ export default class ShopListItem extends Component {
         })
     }
 
+    markItemRemoved = (number) => {
+        this.setState({
+            counter: this.state.counter - number
+        })
+    }
+
+    getItemCounter = () => {
+        return this.state.counter
+    }
+
     onItemAdded = () => {
         this.props.onItemAdded(this.props.item)
     }
 
     onItemRemoved = () => {
-        this.setState({
-            counter: this.state.counter - 1
-        })
         this.props.onItemRemoved(this.props.item)
     }
 

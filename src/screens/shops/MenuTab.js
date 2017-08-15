@@ -12,10 +12,12 @@ import Button from 'react-native-button';
 import Modal from 'react-native-modalbox';
 import ItemOption from './ItemOption';
 import ItemRemovalSelection from './ItemRemovalSelection';
+import SummarySelection from './SummarySelection';
 
 export default class MenuTab extends Component {
     constructor (props) {
         super (props);
+        console.log(this.props)
         this.state = {
             isLoading: true,
             cart: new Map,
@@ -24,13 +26,11 @@ export default class MenuTab extends Component {
             itemFocus: false,
             order: {
                 shop: {
-                    id: this.props._id,
-                    name: this.props.name,
-                    place: this.props.place,
-                    avatar_url: this.props.avatar_url
+                    id: this.props.shop._id,
+                    ...this.props.shop
                 },
                 items: [],
-                delivery_fee: this.props.delivery_fee,
+                delivery_fee: this.props.shop.delivery_fee,
                 total_price: 0
             }
         };
@@ -48,7 +48,7 @@ export default class MenuTab extends Component {
                     "clause": {
                         "type": "eq",
                         "field": "shop_id",
-                        "value": this.props._id
+                        "value": this.props.shop._id
                     }
                 },
                 "bestEffortLimit": 10
@@ -217,8 +217,41 @@ export default class MenuTab extends Component {
     }
 
     onSummaryPressed = () => {
-
-        this.refs.summaryModal.open()
+        let allItems = []
+        let promises = []
+        for (let i = 0; i ++ < this.state.cart.size; this.state.cart.next()) {
+            let promise = new Promise((resolve) => {
+                allItems.push(
+                    <SummarySelection
+                        key={this.state.cart.key()}
+                        item={this.state.cart.value()}
+                        onItemAdded={(item) => {
+                            this.setState({
+                                currentItem: item,
+                                itemFocus: true,
+                            }, this.onItemAddedToCart)
+                        }}
+                        onItemRemoved={(item) => {
+                            this.setState({
+                                currentItem: item,
+                                itemFocus: true,
+                            }, this.onItemRemovedFromCart)
+                        }}
+                    />
+                )
+                resolve()
+            })
+            promises.push(promise)
+        }
+        Promise.all(promises).then(() => {
+            this.setState({
+                allItems: allItems
+            }, () => {
+                this.refs.summaryModal.open()
+                for (let i = 0; i ++ < this.state.cart.size; this.state.cart.next()) {
+                }
+            })
+        })
     }
 
     render () {
@@ -257,8 +290,35 @@ export default class MenuTab extends Component {
                     </ScrollView>
                     <Modal style={[styles.itemCustomizationModal]}
                            position={"bottom"} ref={"summaryModal"}
-                           swipeToClose={true}>
+                           swipeToClose={false}>
+                        <View style={styles.customizationTitle}>
+                            <View style={styles.customizationAvatarContainer}>
+                                <Image
+                                    style={{width: 65, height: 65, resizeMode: 'contain'}}
+                                    source={{uri: this.props.shop.avatar_url}}
+                                />
+                            </View>
+                            <View style={{justifyContent: 'space-around', paddingVertical: 10, flex: 1}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <View style={{flex: 1}}>
+                                        <Text numberOfLines={1} style={styles.itemName}>{this.props.shop.name}</Text>
+                                    </View>
+                                </View>
+                                <Text style={styles.rating}>Monthly Sold: {this.props.shop.monthly_sold}</Text>
+                            </View>
+                                <View style={{marginRight: 10, flexDirection: 'row', alignItems: 'center'}}>
+                                    <Icon.Button name="ios-trash-outline" size={20} iconStyle={{marginRight: 5}}
+                                                 color={'#ffffff'}
+                                                 backgroundColor={'#f20000'}
+                                                 borderRadius={5} height={30} style={{marginRight:0}}>
+                                        <Text style={{fontSize: 14, color: '#ffffff'}}>Clear</Text>
 
+                                    </Icon.Button>
+                                </View>
+                        </View>
+                        <ScrollView style={styles.customizationOptions}>
+                            {this.state.allItems}
+                        </ScrollView>
                     </Modal>
                 </View>
 
@@ -282,7 +342,7 @@ export default class MenuTab extends Component {
                         <View style={styles.totalPrice}>
                             <Text style={{fontSize: 16, color: '#0c64ff'}}>${this.state.order.total_price} </Text>
                             <Text style={{fontSize: 10, color: '#a2a2a2'}}>
-                                Delivery Fee: {this.props.delivery_fee}
+                                Delivery Fee: {this.props.shop.delivery_fee}
                             </Text>
                         </View>
 

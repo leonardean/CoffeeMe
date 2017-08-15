@@ -57,7 +57,7 @@ export default class SingleShop extends Component {
                 <Tabs>
                     <View title="Menu" style={styles.content}>
                         <MenuTab
-                            {...this.props.shopInfo}
+                            shop={this.props.shopInfo}
                             placeOrder={this.placeOrder} />
                     </View>
                     {/* Second tab */}

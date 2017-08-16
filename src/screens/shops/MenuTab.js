@@ -2,7 +2,7 @@
  * Created by leonardean on 02/08/2017.
  */
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity, Alert} from 'react-native';
 import MenuListItem from './MenuListItem';
 import Global from '../../Global';
 import Map from '../../components/util/Map';
@@ -254,6 +254,38 @@ export default class MenuTab extends Component {
         })
     }
 
+    onClearCartPressed = () => {
+        Alert.alert(
+            'Warning',
+            'Are you sure you want to clear the cart?',
+            [
+                {text: 'Yes', onPress: () => {
+                    this.clearCart()
+                }},
+                {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'}
+            ],
+            { cancelable: false }
+        )
+    }
+
+    clearCart = () => {
+        const order = Object.assign({}, this.state.order, {total_price: 0});
+        this.setState({order, BadgeCount: 0, allItems: undefined}, () => {
+            let promises = []
+            for (let i = 0; i++ < this.state.cart.size; this.state.cart.next()) {
+                let promise = new Promise((resolve) => {
+                    this.refs[this.state.cart.value()._id].markItemRemoved(this.refs[this.state.cart.value()._id].getItemCounter())
+                    resolve()
+                })
+                promises.push(promise)
+            }
+            Promise.all(promises).then(()=> {
+                this.state.cart.removeAll()
+                this.refs.summaryModal.close()
+            }).catch().done()
+        });
+    }
+
     render () {
         if (this.state.isLoading) {
             return (
@@ -308,11 +340,10 @@ export default class MenuTab extends Component {
                             </View>
                                 <View style={{marginRight: 10, flexDirection: 'row', alignItems: 'center'}}>
                                     <Icon.Button name="ios-trash-outline" size={20} iconStyle={{marginRight: 5}}
-                                                 color={'#ffffff'}
-                                                 backgroundColor={'#f20000'}
+                                                 color={'#ffffff'} backgroundColor={this.state.BadgeCount === 0 ? '#f2acb1' : '#f20000'}
+                                                 onPress={this.onClearCartPressed} disabled={this.state.BadgeCount === 0}
                                                  borderRadius={5} height={30} style={{marginRight:0}}>
                                         <Text style={{fontSize: 14, color: '#ffffff'}}>Clear</Text>
-
                                     </Icon.Button>
                                 </View>
                         </View>

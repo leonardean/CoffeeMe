@@ -195,9 +195,34 @@ export default class OrderConfirm extends Component {
                                     data={this.state.order.items.map((item, index) => {
                                         return Object.assign({}, item, { key: index})
                                     })}
-                                    renderItem={({item}) => { return (<View style={{flexDirection: 'row'}}>
+                                    renderItem={({item}) => {
+                                        let options = item.options.map((option)=>{
+                                            return option.values.map((value) => {
+                                                if (value.selected === true)
+                                                    return (
+                                                        <View style={{backgroundColor: '#ebf6ff',
+                                                            padding: 2,
+                                                            paddingHorizontal: 5,
+                                                            borderRadius: 5,
+                                                            marginTop: -5,
+                                                            marginBottom: 5,
+                                                            marginRight: 5,
+                                                            flexWrap: 'nowrap',
+                                                            height: 18}}
+                                                              key={value.name}
+                                                        >
+                                                            <Text style={{color: '#0c64ff', fontSize: 10}}>{value.name}</Text>
+                                                        </View>
+                                                    )
+                                            })
+                                        })
+
+                                        return (<View style={{flexDirection: 'row', alignItems: 'center'}} key={item.feature_id}>
                                         <View style={{flex: 1}}>
                                             <Text style={styles.textMinor} numberOfLines={2}>{item.name}</Text>
+                                            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                                                {options}
+                                            </View>
                                         </View>
                                         <View style={{width: 50}}>
                                             <Text style={styles.textMinor} numberOfLines={1}>{item.quantity}</Text>

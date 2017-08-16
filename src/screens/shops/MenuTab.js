@@ -196,12 +196,9 @@ export default class MenuTab extends Component {
         for(let i = 0; i++ < this.state.cart.size; this.state.cart.next()) {
             let promise = new Promise((resolve) => {
                 let item = {
-                    id: this.state.cart.key()._id,
-                    avatar_url: this.state.cart.key().avatar_url,
-                    name: this.state.cart.key().name,
-                    price: this.state.cart.key().price,
-                    quantity: this.state.cart.value(),
-                    sub_total: this.state.cart.key().price * this.state.cart.value()
+                    feature_id: this.state.cart.key(),
+                    ...this.state.cart.value(),
+                    sub_total: this.state.cart.value().price * this.state.cart.value().quantity
                 }
                 total_price += item.sub_total
                 items.push(item)

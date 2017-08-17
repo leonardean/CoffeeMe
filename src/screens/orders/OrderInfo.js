@@ -9,8 +9,6 @@ export default class Account extends React.Component {
 
     constructor (props) {
         super(props)
-        console.log(this.props)
-
     }
 
     componentWillMount () {
@@ -33,7 +31,7 @@ export default class Account extends React.Component {
                 this.setState({
                     iconTitle: "ios-checkmark-circle",
                     iconColor: "green",
-                    orderStatus: "Accepted"
+                    orderStatus: "Completed"
                 })
                 break
         }
@@ -57,19 +55,58 @@ export default class Account extends React.Component {
         });
     }
 
+    goToComment = () => {
+        this.props.navigator.push({
+            screen: 'CommentCompose',
+            title: 'Comment',
+            passProps: {
+                shopInfo: Object.assign({}, this.props.order.shop,
+                    {'_id': this.props.order.shop.id})
+            },
+            animated: true,
+            animationType: 'slide-horizontal',
+            navigatorStyle: {
+                tabBarHidden: true
+            }
+        })
+
+    }
+
     render() {
         let items = []
         this.props.order.items.forEach((item) => {
+            let options = item.options.map((option)=>{
+                return option.values.map((value) => {
+                    if (value.selected === true)
+                        return (
+                            <View style={{backgroundColor: '#ebf6ff',
+                                padding: 2,
+                                paddingHorizontal: 5,
+                                borderRadius: 5,
+                                marginBottom: 5,
+                                marginRight: 5,
+                                flexWrap: 'nowrap',
+                                height: 18}}
+                                  key={value.name}
+                            >
+                                <Text style={{color: '#0c64ff', fontSize: 10}}>{value.name}</Text>
+                            </View>
+                        )
+                })
+            })
             if (item.quantity !== 0)
                 items.push(
-                    <View style={[styles.row, {marginVertical: 5}]}>
+                    <View style={[styles.row, {marginVertical: 5}]} key={item.feature_id}>
                         <View style={{flex: 1}}>
-                            <Text>{item.name}</Text>
+                            <Text style={styles.textMinor} numberOfLines={2}>{item.name}</Text>
+                            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                                {options}
+                            </View>
                         </View>
-                        <View style={{flex: 1}}>
+                        <View style={{width: 60, alignSelf: 'center'}}>
                             <Text>x {item.quantity}</Text>
                         </View>
-                        <View style={{width: 30}}>
+                        <View style={{width: 30, alignSelf: 'center'}}>
                             <Text>${item.sub_total}</Text>
                         </View>
                     </View>
@@ -100,13 +137,19 @@ export default class Account extends React.Component {
                                 <Icon name="ios-arrow-forward" size={25} color="#a2a2a2"/>
                             </View>
                         </TouchableOpacity>
-                        <View style={{borderTopWidth: 0.5, borderTopColor: '#f0f0f0', paddingVertical: 5, flexDirection:'row'}}>
-                            <View style={{flex: 1}}/>
-                            <Icon.Button backgroundColor="#ffffff" color="black" style={{alignSelf: 'center'}}
-                                         iconStyle={{marginRight: 0}} onPress={this.goToShop} >
-                                Order Again
-                            </Icon.Button>
-                            <View style={{flex: 1}}/>
+                        <View style={{borderTopWidth: 0.5, borderTopColor: '#f0f0f0', paddingVertical: 5, flexDirection:'row', justifyContent: 'space-around'}}>
+                            <View>
+                                <Icon.Button backgroundColor="#ffffff" color="black" style={{alignSelf: 'center'}}
+                                             iconStyle={{marginRight: 0}} onPress={this.goToShop}>
+                                    Order Again
+                                </Icon.Button>
+                            </View>
+                            <View style={{display: this.props.order.order_status === 5 ? 'flex' : 'none'}}>
+                                <Icon.Button backgroundColor="#ffffff" color="black" style={{alignSelf: 'center'}}
+                                             iconStyle={{marginRight: 0}} onPress={this.goToComment}>
+                                    Comment
+                                </Icon.Button>
+                            </View>
                         </View>
                     </View>
                     <View style={styles.segment}>

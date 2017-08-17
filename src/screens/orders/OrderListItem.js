@@ -14,6 +14,27 @@ export default class OrderListItem extends Component {
 
     }
 
+    componentWillMount () {
+        switch(this.props.order.order_status) {
+            case 0:
+                this.setState({
+                    orderStatus: "Placed"
+                })
+                break
+            case 1:
+                this.setState({
+                    orderStatus: "Accepted"
+                })
+                break
+            case 5:
+                this.setState({
+                    orderStatus: "Completed"
+                })
+                break
+        }
+
+    }
+
     goToShop = () => {
         this.props.onShopPress(this.props.order)
     }
@@ -71,7 +92,7 @@ export default class OrderListItem extends Component {
                 </View>
                 <View style={[styles.segment, styles.footer, styles.row,
                     {borderTopWidth: 0.5, borderTopColor: '#f0f0f0', paddingVertical: 3}]}>
-                    <Text style={{alignSelf: 'center', color: '#c2c2c2', marginLeft: 5}}>Order Completed</Text>
+                    <Text style={{alignSelf: 'center', color: '#a5a5a5', marginLeft: 5}}>Order {this.state.orderStatus}</Text>
                     <Icon.Button backgroundColor="#ffffff" color="black" iconStyle={{marginRight: 0}} onPress={this.goToShop} >
                         Order Again
                     </Icon.Button>

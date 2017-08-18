@@ -65,7 +65,7 @@ export default class OrderConfirm extends Component {
             placingOrder: true,
             order: Object.assign({}, this.state.order, {
                 order_status: 0,
-                timestamp_order_placed: new Date()
+                timestamp_order_0: new Date()
             })
         }, () => {
             fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects', {

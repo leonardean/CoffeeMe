@@ -61,7 +61,8 @@ export default class Account extends React.Component {
             title: 'Comment',
             passProps: {
                 shopInfo: Object.assign({}, this.props.order.shop,
-                    {'_id': this.props.order.shop.id})
+                    {'_id': this.props.order.shop.id}),
+                driverInfo: this.props.order.driver
             },
             animated: true,
             animationType: 'slide-horizontal',

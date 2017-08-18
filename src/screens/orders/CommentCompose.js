@@ -2,8 +2,11 @@
  * Created by leonardean on 17/08/2017.
  */
 import React from 'react';
-import { Text, View, ScrollView, Image, StyleSheet, TextInput } from 'react-native';
+import { Text, View, ScrollView, Image, StyleSheet, TextInput, Alert } from 'react-native';
 import StarRating from 'react-native-star-rating';
+import Global from '../../Global';
+import Spinner from 'react-native-loading-spinner-overlay';
+import Toast from 'react-native-root-toast';
 
 export default class CommentCompose extends React.Component {
    constructor (props) {
@@ -12,7 +15,8 @@ export default class CommentCompose extends React.Component {
            shopStarCount: 0,
            driverStarCount: 0,
            shopComment: '',
-           driverComment: ''
+           driverComment: '',
+           postingComponent: false
        };
        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
    }
@@ -35,7 +39,71 @@ export default class CommentCompose extends React.Component {
    }
 
    submitComment = () => {
-
+       this.setState({
+           postingComponent: true
+       }, () => {
+           fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+               + Global.userID, {
+               method: 'GET',
+               headers: {
+                   'Authorization': 'Bearer ' + Global.userAccessToken
+               }
+           })
+               .then((response) => response.json())
+               .then((responseJson) => {
+                   fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/COMMENTS/objects', {
+                       method: 'POST',
+                       headers: {
+                           'Authorization': 'Bearer '+ Global.userAccessToken,
+                           'Content-Type': 'application/json',
+                       },
+                       body: JSON.stringify({
+                           user: {
+                               id: Global.userID,
+                               avatar_url: responseJson.avatar_url,
+                               display_name: Global.username
+                           },
+                           shop: {
+                               id: this.props.shopInfo.id,
+                               avatar_url: this.props.shopInfo.avatar_url,
+                               name: this.props.shopInfo.name,
+                               star: this.state.shopStarCount,
+                               comment: this.state.shopComment
+                           },
+                           driver: {
+                               id: this.props.driverInfo.id,
+                               avatar_url: this.props.driverInfo.avatar_url,
+                               display_name: this.props.driverInfo.display_name,
+                               star: this.state.driverStarCount,
+                               comment: this.state.driverComment
+                           }
+                       })
+                   })
+                       .then((response) => {
+                           if (response.status === 201)
+                               this.setState({
+                                   postingComponent: false
+                               }, () => {
+                                   this.props.navigator.push({
+                                       screen: 'CommentSuccess',
+                                       title: 'Comment Success',
+                                       animated: true,
+                                       animationType: 'slide-horizontal',
+                                       backButtonHidden: true,
+                                       navigatorStyle: {
+                                           tabBarHidden: true
+                                       }
+                                   })
+                               })
+                       })
+                       .catch((error) => {
+                           console.error(error);
+                       });
+               })
+               .catch((error) => {
+                   console.error(error);
+               });
+       })
    }
 
    onShopStarRatingPress = (rating) => {
@@ -53,6 +121,8 @@ export default class CommentCompose extends React.Component {
    render () {
        return (
            <ScrollView style={styles.container}>
+               <Spinner visible={this.state.postingComponent} size="small" textContent={"Posting Comments..."}
+                        textStyle={{color: '#FFF', marginTop: -30, fontSize: 14}} />
                <View style={styles.shopTitle}>
                    <View style={styles.avatarContainer}>
                        <Image

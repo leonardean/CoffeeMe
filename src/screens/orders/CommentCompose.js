@@ -42,7 +42,7 @@ export default class CommentCompose extends React.Component {
        this.setState({
            postingComponent: true
        }, () => {
-           fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+           fetch('https://api-jp.kii.com/api/apps/Global.appID/users/'
                + Global.userID, {
                method: 'GET',
                headers: {
@@ -51,7 +51,7 @@ export default class CommentCompose extends React.Component {
            })
                .then((response) => response.json())
                .then((responseJson) => {
-                   fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/COMMENTS/objects', {
+                   fetch('https://api-jp.kii.com/api/apps/Global.appID/buckets/COMMENTS/objects', {
                        method: 'POST',
                        headers: {
                            'Authorization': 'Bearer '+ Global.userAccessToken,

@@ -42,7 +42,7 @@ export default class Orders extends React.Component {
     }
 
     fetchOrders = (cb) => {
-        fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/query', {
+        fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/ORDERS/query', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + Global.userAccessToken,

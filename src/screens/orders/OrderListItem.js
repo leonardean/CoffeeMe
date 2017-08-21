@@ -82,7 +82,7 @@ export default class OrderListItem extends Component {
         }
         items.push(
             <View style={[styles.row, {marginHorizontal: 5}]}>
-                <Text style={{fontSize: 12, color: '#c2c2c2'}}>{new Date(this.props.order.timestamp_order_placed).toLocaleString()}</Text>
+                <Text style={{fontSize: 12, color: '#c2c2c2'}}>{new Date(this.props.order.timestamp_order_status_0).toLocaleString()}</Text>
                 <Text>Total: $ {this.props.order.total_price}</Text>
             </View>
         )

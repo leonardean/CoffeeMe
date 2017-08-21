@@ -23,7 +23,7 @@ export default class OrderConfirm extends Component {
     }
 
     componentDidMount() {
-        return fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+        return fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/users/'
             + Global.userID, {
             method: 'GET',
             headers: {
@@ -68,7 +68,7 @@ export default class OrderConfirm extends Component {
                 timestamp_order_status_0: new Date()
             })
         }, () => {
-            fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects', {
+            fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/ORDERS/objects', {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer '+ Global.userAccessToken,
@@ -82,7 +82,7 @@ export default class OrderConfirm extends Component {
                         return response.json()
                 })
                 .then((responseJson) => {
-                    fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects/' + responseJson.objectID, {
+                    fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/ORDERS/objects/' + responseJson.objectID, {
                         method: 'GET',
                         headers: {
                             'Authorization': 'Bearer '+ Global.userAccessToken
@@ -90,7 +90,7 @@ export default class OrderConfirm extends Component {
                     })
                         .then((response) => response.json())
                         .then((responseJson) => {
-                            fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+                            fetch('https://api-jp.kii.com/api/apps/Global.appID/users/'
                                 + Global.userID, {
                                 method: 'GET',
                                 headers: {
@@ -102,7 +102,7 @@ export default class OrderConfirm extends Component {
                                     let userAttribute = responseJson
                                     userAttribute.member_point += userAttribute.member_point += this.state.order.total_price * 10
                                     userAttribute.balance  = userAttribute.balance - this.state.order.total_price
-                                    fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+                                    fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/users/'
                                         + Global.userID, {
                                         method: 'POST',
                                         headers: {

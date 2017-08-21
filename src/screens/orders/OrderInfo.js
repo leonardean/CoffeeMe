@@ -9,6 +9,24 @@ export default class Account extends React.Component {
 
     constructor (props) {
         super(props)
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
+
+    static navigatorButtons = {
+        rightButtons: [
+            {
+                title: 'Close',
+                id: 'close'
+            }
+        ]
+    }
+
+    onNavigatorEvent (event) {
+        if (event.type === 'NavBarButtonPress') {
+            if (event.id === 'close') {
+                this.props.navigator.popToRoot();
+            }
+        }
     }
 
     componentWillMount () {
@@ -25,6 +43,27 @@ export default class Account extends React.Component {
                     iconTitle: "ios-locate",
                     iconColor: "#00D7EB",
                     orderStatus: "Accepted"
+                })
+                break
+            case 2:
+                this.setState({
+                    iconTitle: "ios-locate",
+                    iconColor: "#c12215",
+                    orderStatus: "Preparing"
+                })
+                break
+            case 3:
+                this.setState({
+                    iconTitle: "ios-locate",
+                    iconColor: "#5f61f3",
+                    orderStatus: "Ready"
+                })
+                break
+            case 4:
+                this.setState({
+                    iconTitle: "ios-locate",
+                    iconColor: "#cac817",
+                    orderStatus: "Delivering"
                 })
                 break
             case 5:

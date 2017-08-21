@@ -90,7 +90,7 @@ export default class OrderConfirm extends Component {
                     })
                         .then((response) => response.json())
                         .then((responseJson) => {
-                            fetch('https://api-jp.kii.com/api/apps/Global.appID/users/'
+                            fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/users/'
                                 + Global.userID, {
                                 method: 'GET',
                                 headers: {

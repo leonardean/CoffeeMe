@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class ShopListItem extends Component {
     constructor (props) {
         super(props);
+        console.log(this.props)
         this.state = {
             counter: 0
         };
@@ -54,6 +55,9 @@ export default class ShopListItem extends Component {
                     <View style={styles.thirdRow}>
                         <Text style={styles.fee}>$ {this.props.item.price}</Text>
                         <View style={styles.counterContainer}>
+                            <View display={this.props.item.on_stock === true ? 'none': 'flex'}>
+                                <Text style={{color: '#a2a2a2'}}> Item Not Available</Text>
+                            </View>
                             <Icon.Button name="ios-remove-circle-outline" size={25}
                                          margin={-5} iconStyle={{marginRight: 0}}
                                          color="black" backgroundColor="white"
@@ -63,7 +67,7 @@ export default class ShopListItem extends Component {
                                 <Text style={styles.counter}>{this.state.counter}</Text>
                             </View>
                             <Icon.Button name="ios-add-circle-outline" size={25}
-                                         margin={-5} iconStyle={{marginRight: 0}}
+                                         margin={-5} iconStyle={{marginRight: 0}} display={this.props.item.on_stock === true ? 'flex': 'none'}
                                          color="black" backgroundColor="white" onPress={this.onItemAdded}/>
                         </View>
                     </View>

@@ -82,7 +82,6 @@ export default class OrderConfirm extends Component {
                         return response.json()
                 })
                 .then((responseJson) => {
-                    // console.log(responseJson)
                     fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/ORDERS/objects/' + responseJson.objectID, {
                         method: 'GET',
                         headers: {
@@ -91,6 +90,37 @@ export default class OrderConfirm extends Component {
                     })
                         .then((response) => response.json())
                         .then((responseJson) => {
+                            fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+                                + Global.userID, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': 'Bearer ' + Global.userAccessToken
+                                }
+                            })
+                                .then((response) => response.json())
+                                .then((responseJson) => {
+                                    let userAttribute = responseJson
+                                    userAttribute.member_point += userAttribute.member_point += this.state.order.total_price * 10
+                                    userAttribute.balance  = userAttribute.balance - this.state.order.total_price
+                                    fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/users/'
+                                        + Global.userID, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Authorization': 'Bearer ' + Global.userAccessToken,
+                                            'Content-Type': 'application/vnd.kii.UserUpdateRequest+json'
+                                        },
+                                        body: JSON.stringify(userAttribute)
+                                    }).then((response) => {
+                                        console.log(response)
+                                        return response.json()
+                                    }).then((responseJson) => {
+                                        console.log(responseJson)
+                                    })
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+
                             this.setState({
                                 placingOrder: false
                             }, () => {

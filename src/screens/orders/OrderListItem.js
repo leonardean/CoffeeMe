@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class OrderListItem extends Component {
     constructor (props) {
         super(props)
+        console.log(this.props)
     }
 
     componentDidMount () {
@@ -24,6 +25,21 @@ export default class OrderListItem extends Component {
             case 1:
                 this.setState({
                     orderStatus: "Accepted"
+                })
+                break
+            case 2:
+                this.setState({
+                    orderStatus: "Preparing"
+                })
+                break
+            case 3:
+                this.setState({
+                    orderStatus: "Ready"
+                })
+                break
+            case 4:
+                this.setState({
+                    orderStatus: "Delivering"
                 })
                 break
             case 5:

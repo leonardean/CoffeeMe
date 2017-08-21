@@ -12,7 +12,7 @@ export default class Shops extends Component {
     }
 
     componentDidMount() {
-        return fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/SHOPS/query', {
+        return fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/SHOPS/query', {
                 method: 'POST',
                 headers: {
                     'Authorization': Global.basicAccessToken,
@@ -29,6 +29,7 @@ export default class Shops extends Component {
             })
             .then((response) => response.json())
             .then((responseJson) => {
+                console.log(responseJson)
                 this.setState({
                     isLoading: false,
                     shopsList: responseJson.results.map(shop => {

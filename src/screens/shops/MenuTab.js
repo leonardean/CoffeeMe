@@ -37,7 +37,7 @@ export default class MenuTab extends Component {
     }
 
     componentWillMount () {
-        return fetch('https://api-jp.kii.com/api/apps/2c1pzz9jg5dd/buckets/STOCK_ITEMS_CONSUMER/query', {
+        return fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/STOCK_ITEMS_CONSUMER/query', {
             method: 'POST',
             headers: {
                 'Authorization': Global.basicAccessToken,

@@ -2,7 +2,7 @@
  * Created by leonardean on 03/08/2017.
  */
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert, Platform} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Platform} from 'react-native';
 import Picker from 'react-native-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Global from '../../Global';

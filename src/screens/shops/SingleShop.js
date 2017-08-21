@@ -62,7 +62,8 @@ export default class SingleShop extends Component {
                     </View>
                     {/* Second tab */}
                     <View title="Comments" style={styles.content}>
-                        <CommentsTab></CommentsTab>
+                        <CommentsTab
+                            shop={this.props.shopInfo}/>
                     </View>
                     {/* Third tab */}
                     <View title="Shop" style={styles.content}>

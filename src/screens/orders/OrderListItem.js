@@ -8,15 +8,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class OrderListItem extends Component {
     constructor (props) {
         super(props)
-        console.log(this.props)
     }
 
-    componentDidMount () {
-
-    }
-
-    componentWillMount () {
-        switch(this.props.order.order_status) {
+    setOrderStatus = (order) => {
+        switch(order.order_status) {
             case 0:
                 this.setState({
                     orderStatus: "Placed"
@@ -48,7 +43,14 @@ export default class OrderListItem extends Component {
                 })
                 break
         }
+    }
 
+    reload = (order) => {
+        this.setOrderStatus(order)
+    }
+
+    componentWillMount () {
+        this.setOrderStatus(this.props.order)
     }
 
     goToShop = () => {

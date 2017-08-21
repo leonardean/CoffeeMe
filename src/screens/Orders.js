@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet, FlatList, ActivityIndicator, Alert} from 'react-native';
+import { Text, View, StyleSheet, RefreshControl, ActivityIndicator, ScrollView} from 'react-native';
 import Global from '../Global';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import OrderListItem from './orders/OrderListItem';
@@ -20,6 +20,9 @@ export default class Orders extends React.Component {
                 refreshing: true
             })
             this.fetchOrders(() => {
+                this.state.orderList.map((order, index) => {
+                    this.refs[index].reload(order.orderInfo)
+                })
                 this.setState({
                     refreshing: false
                 }, resolve())
@@ -55,7 +58,7 @@ export default class Orders extends React.Component {
                         "field": "customer.id",
                         "value": Global.userID
                     },
-                    "orderBy": "timestamp_order_placed",
+                    "orderBy": "timestamp_order_status_0",
                     "descending": true
                 },
                 "bestEffortLimit": 10
@@ -63,6 +66,7 @@ export default class Orders extends React.Component {
         })
             .then((response) => response.json())
             .then((responseJson) => {
+                console.log('fetched')
                 this.setState({
                     isLoading: false,
                     orderList: responseJson.results.map(order => {
@@ -135,6 +139,7 @@ export default class Orders extends React.Component {
     }
 
     render () {
+        console.log('re-rendering')
         if (this.state.isLoading && this.state.isLogin) {
             return (
                 <View style={{flex: 1, paddingTop: 20}}>
@@ -142,21 +147,44 @@ export default class Orders extends React.Component {
                 </View>
             );
         }
+        let orderListItems
+        if (Global.userAuthenticated === true)
+            orderListItems = this.state.orderList.map((order, index) => {
+                return (
+                    <OrderListItem
+                        key={index}
+                        ref={index}
+                        order={order.orderInfo}
+                        onOrderAgainPress={this.goToShop}
+                        onShopPress={this.goToShop}
+                        onOrderPress={this.goToOrderInfo}
+                    />
+                )
+            })
+
         return(
             <View style={styles.container}>
                 {Global.userAuthenticated ?
                     <View>
-                        <FlatList
-                            onRefresh={this._refresh}
-                            refreshing={this.state.refreshing}
-                            data={this.state.orderList}
-                            renderItem={({item}) => <OrderListItem
-                                order={item.orderInfo}
-                                onOrderAgainPress={this.goToShop}
-                                onShopPress={this.goToShop}
-                                onOrderPress={this.goToOrderInfo}
-                            />}
-                        />
+                        <ScrollView refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._refresh}
+                            />
+                        }>
+                            {orderListItems}
+                        </ScrollView>
+                        {/*<FlatList*/}
+                            {/*onRefresh={this._refresh}*/}
+                            {/*refreshing={this.state.refreshing}*/}
+                            {/*data={this.state.orderList}*/}
+                            {/*renderItem={({item}) => <OrderListItem*/}
+                                {/*order={item.orderInfo}*/}
+                                {/*onOrderAgainPress={this.goToShop}*/}
+                                {/*onShopPress={this.goToShop}*/}
+                                {/*onOrderPress={this.goToOrderInfo}*/}
+                            {/*/>}*/}
+                        {/*/>*/}
                     </View>:
                     <View style={{alignSelf: 'center', marginTop: 100}}>
                         <Text style={{ color: '#a2a2a2', alignSelf: 'center', fontSize: 12, marginBottom: 20 }}>

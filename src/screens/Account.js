@@ -102,13 +102,16 @@ export default class Account extends React.Component {
         let userInfo
         if (Global.userAuthenticated === true) {
             userInfo =
-                <View style={{alignItems: 'center', backgroundColor: 'white', height: 190, marginBottom: 4}}>
+                <View style={{alignItems: 'center', backgroundColor: 'white', marginBottom: 4}}>
                     <Image
                         style={{width: 80, height: 80, resizeMode: 'contain', borderRadius: 40, marginTop: 40}}
                         source={{uri: this.state.userInfo.avatar_url}}
                     />
-                    <Text style={{marginVertical: 10}}>{Global.username}</Text>
-                    <Text style={{marginBottom: 10, color: '#a2a2a2', fontSize: 12}}>Balance: $ {this.state.userInfo.balance}</Text>
+                    <Text style={{marginVertical: 10, fontSize: 16, fontWeight: 'bold'}}>{this.state.userInfo.displayName}</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-around', width: 250}}>
+                        <Text style={{marginBottom: 10, color: '#a2a2a2', fontSize: 12}}>Balance: $ {this.state.userInfo.balance}</Text>
+                        <Text style={{marginBottom: 10, color: '#a2a2a2', fontSize: 12}}>Points: {this.state.userInfo.member_point}</Text>
+                    </View>
                 </View>
         } else {
             userInfo =

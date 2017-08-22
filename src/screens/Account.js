@@ -11,6 +11,23 @@ export default class Account extends React.Component {
             isLoading: true,
             isLogin: false
         }
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
+
+    onNavigatorEvent(event) {
+        switch(event.id) {
+            case 'willAppear':
+                if (this.state.isLogin === true) {
+                    this.fetchUser()
+                }
+                break;
+            case 'didAppear':
+                break;
+            case 'willDisappear':
+                break;
+            case 'didDisappear':
+                break;
+        }
     }
 
     componentDidMount () {

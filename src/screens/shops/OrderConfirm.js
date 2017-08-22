@@ -100,7 +100,7 @@ export default class OrderConfirm extends Component {
                                 .then((response) => response.json())
                                 .then((responseJson) => {
                                     let userAttribute = responseJson
-                                    userAttribute.member_point += userAttribute.member_point += this.state.order.total_price * 10
+                                    userAttribute.member_point = userAttribute.member_point + this.state.order.total_price * 10
                                     userAttribute.balance  = userAttribute.balance - this.state.order.total_price
                                     fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/users/'
                                         + Global.userID, {

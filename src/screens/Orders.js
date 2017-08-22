@@ -12,6 +12,23 @@ export default class Orders extends React.Component {
             isLogin: false,
             refreshing: false
         };
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
+
+    onNavigatorEvent(event) {
+        switch(event.id) {
+            case 'willAppear':
+                if (this.state.isLogin === true) {
+                    this.fetchOrders()
+                }
+                break;
+            case 'didAppear':
+                break;
+            case 'willDisappear':
+                break;
+            case 'didDisappear':
+                break;
+        }
     }
 
     _refresh = () => {
@@ -45,6 +62,9 @@ export default class Orders extends React.Component {
     }
 
     fetchOrders = (cb) => {
+        this.setState({
+            isLoading: true
+        })
         fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/buckets/ORDERS/query', {
             method: 'POST',
             headers: {

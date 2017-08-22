@@ -52,6 +52,9 @@ export default class Account extends React.Component {
 
     fetchUser = () => {
         console.log(Global.userAccessToken)
+        this.setState({
+            isLoading: true
+        })
         fetch('https://api-jp.kii.com/api/apps/' + Global.appID + '/users/'
             + Global.userID, {
             method: 'GET',

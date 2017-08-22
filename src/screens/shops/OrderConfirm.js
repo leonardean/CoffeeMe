@@ -275,6 +275,7 @@ export default class OrderConfirm extends Component {
                     <View style={styles.summary}>
                         <View style={styles.totalPrice}>
                             <Text style={{fontSize: 16, color: '#0c64ff'}}>Total: $ {this.state.order.total_price} </Text>
+                            <Text style={{fontSize: 14, color: '#a2a2a2'}}>Points: {this.state.order.total_price * 10} </Text>
                         </View>
                     </View>
                     <Icon.Button name="ios-flag" size={22} iconStyle={{marginRight: 10}}
@@ -335,4 +336,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
+    totalPrice: {
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 10
+    }
 });
